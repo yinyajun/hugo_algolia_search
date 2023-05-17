@@ -1,4 +1,4 @@
-module hugo_search
+module github.com/yinyajun/hugo_algolia_search
 
 go 1.18
 

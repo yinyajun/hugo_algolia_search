@@ -1,4 +1,4 @@
-package main
+package search
 
 import (
 	"encoding/json"
@@ -6,19 +6,22 @@ import (
 	"log"
 	"math"
 	"os"
+	"path/filepath"
 	"unicode"
 
 	"github.com/algolia/algoliasearch-client-go/v3/algolia/search"
 )
 
-var (
-	algoliaIndex = "./.algolia_index"
-	existed      = make(map[string][]string)
-)
+var existed = make(map[string][]string)
 
-func init() {
-	bytes, _ := os.ReadFile(algoliaIndex)
+func restore() string {
+	if Root == "" {
+		panic("Root(hugo site) is not set")
+	}
+	restoreFile := filepath.Join(Root, ".algolia_idx.ckpt")
+	bytes, _ := os.ReadFile(restoreFile)
 	json.Unmarshal(bytes, &existed)
+	return restoreFile
 }
 
 type algoliaObject struct {
@@ -78,7 +81,6 @@ func formatObjects(post *Post) []algoliaObject {
 			URL:          post.Uri,
 			Chunk:        ch,
 			Title:        post.FrontMatter.Title,
-			Description:  post.FrontMatter.Description,
 			Summary:      post.FrontMatter.Summary,
 		}
 		objects = append(objects, obj)
@@ -86,7 +88,9 @@ func formatObjects(post *Post) []algoliaObject {
 	return objects
 }
 
-func UpdateAlgoliaIndex(post *Post) {
+func UpdateAlgoliaIndex(post *Post, conf HugoConf) {
+	f := restore()
+
 	client := search.NewClient(conf.Params["algoliaAppId"].(string), conf.Params["algoliaApiKey"].(string))
 	index := client.InitIndex(conf.Params["algoliaIndexName"].(string))
 
@@ -114,5 +118,5 @@ func UpdateAlgoliaIndex(post *Post) {
 
 	// save current
 	bytes, _ := json.Marshal(existed)
-	os.WriteFile(algoliaIndex, bytes, 0666)
+	os.WriteFile(f, bytes, 0666)
 }
