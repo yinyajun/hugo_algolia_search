@@ -12,6 +12,7 @@ Due to algolia record size limit, we need to chunk our post to reduce index reco
     algoliaApiKey = "**********"
     algoliaIndexName = "****"
     ```
+    Note APIKey should be accessible to write Algolia index.
 3. Write some posts, e.g. `~/blog/content/history/a.md`, here `history` is a section.
 4. Run following golang code
     ```go
