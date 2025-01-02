@@ -1,10 +1,12 @@
 package main
 
-import "github.com/yinyajun/hugo_algolia_search"
+import (
+	"fmt"
+	"github.com/yinyajun/hugo_algolia_search"
+)
 
 func main() {
-	print(123)
+	fmt.Println("======")
 	search.Root = "/Users/yinyajun/Projects/github/yinyajun.github.io"
 	search.BuildIndex("posts")
 }
-
