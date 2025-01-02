@@ -34,8 +34,9 @@ type Post struct {
 }
 
 var (
-	HtmlReg, _  = regexp.Compile("<.{0,200}?>")
-	PointReg, _ = regexp.Compile("[\n\t\r]")
+	CodeReg, _    = regexp.Compile("<code([\\s\\S]*)</code>")
+	HtmlReg, _    = regexp.Compile("<.{0,200}?>")
+	NewLineReg, _ = regexp.Compile("[\n\t\r]")
 )
 
 func parsePost(dir, path string) (*Post, error) {
@@ -51,8 +52,9 @@ func parsePost(dir, path string) (*Post, error) {
 
 	// parse content
 	content := blackfriday.Run(res[2])
+	content = CodeReg.ReplaceAll(content, []byte{'.'})
 	content = HtmlReg.ReplaceAll(content, []byte{'.'})
-	content = PointReg.ReplaceAll(content, []byte{'.'})
+	content = NewLineReg.ReplaceAll(content, []byte{'.'})
 
 	return &Post{
 		FrontMatter: frontMatter,
@@ -102,3 +104,4 @@ func ParsePost(nJob int, root string, sections ...string) chan *Post {
 
 	return posts
 }
+
